@@ -5,7 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_desktop/base/BasicPage.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'PositionChangeNotify.dart';
+import 'position_notify.dart';
 
 import 'dart:math' as Math;
 
@@ -23,6 +23,8 @@ class  LargeListPage extends BasicState {
 
   @override
   Widget createContent() {
+    final height = MediaQuery.of(context).size.height;
+    print("height=$height");
     return  Column(
             children: [
               getProgressBar(),
@@ -38,7 +40,7 @@ class  LargeListPage extends BasicState {
     itemPositionsListener.itemPositions.addListener(() {
       // print("value=${itemPositionsListener.itemPositions}");
       var first =itemPositionsListener.itemPositions.value.first.index;
-      var firstPos = first*600/maxLen;
+      var firstPos = first*model.height/maxLen;
       model.changePosY(firstPos);
       // int pos = (dragX*maxLen/600).toInt();
     });
@@ -61,7 +63,6 @@ class  LargeListPage extends BasicState {
   bool startDrag = false;
   Widget getProgressBar(){
     double pWidth  = 20;
-    double pHeight = 600;
     return Expanded(
         child: ChangeNotifierProvider(
             create: (context) => model,
@@ -75,12 +76,14 @@ class  LargeListPage extends BasicState {
                           width: pWidth,
                           child: Stack(
                             children: [
+                              CustomPaint(painter: SignaturePainter(model.posX,
+                                model.posY,model),
+                                  size: Size.infinite),
                               GestureDetector(
                                 onPanDown: onPanDown,
                                 onPanUpdate:onPanUpdate,
                                 onPanEnd: onPanEnd,
                               ),
-                              CustomPaint(painter: new SignaturePainter(pWidth,pHeight,model.posX,model.posY)),
                             ],
                           ),
                         ),
@@ -95,8 +98,8 @@ class  LargeListPage extends BasicState {
     if(local.dy>model.posY&&local.dy<model.posY+40){
       startDrag = true;
       print("start drag");
+      startTimer();
     }
-    startTimer();
   }
   int currentTime = 0;
   Offset? lastPost;
@@ -115,10 +118,10 @@ class  LargeListPage extends BasicState {
     var dragX = local.dy;
     if(dragX<=0)
       dragX = 0;
-    else if(dragX>=560)
-      dragX = 560;
+    else if(dragX>=model.height-40)
+      dragX = model.height-40;
     if(startDrag){
-      int pos = (dragX*maxLen/600).toInt();
+      int pos = (dragX*maxLen/model.height).toInt();
       itemScrollController.jumpTo(index: pos);
       model.changePosY(dragX);
     }
@@ -131,7 +134,7 @@ class  LargeListPage extends BasicState {
   }
 
   void startTimer(){
-    const period = const Duration(milliseconds: 100);
+    const period = const Duration(milliseconds: 150);
     Timer.periodic(period, (timer) {
       if(lastPost!=null)
         changePost(lastPost!, false);
@@ -180,39 +183,35 @@ class  LargeListPage extends BasicState {
 }
 
 class SignaturePainter extends CustomPainter  {
-  SignaturePainter(this.width, this.height,this.posX,this.posY);
+  SignaturePainter(this.posX,this.posY,this.model);
   double cWidth = 15;  //clip square width
   double cHeight = 40;  //clip square height
-  double width;  //total width
-  double height; //total height
   double posX;
   double posY;
+  PositionChangeNotify model;
 
+  @override
   void paint(Canvas canvas, Size size) {
-    Paint paint = new Paint()
+    Paint paint = Paint()
       ..color = Colors.blue
       ..isAntiAlias = true
       ..strokeWidth = 2.0
       ..strokeJoin = StrokeJoin.bevel;
+    model.height = size.height;
+    model.width = size.width;
 
-
-    Paint paint2 = new Paint()
-      ..color = Colors.grey
-      ..isAntiAlias = true
-      ..strokeWidth = 2.0
-      ..strokeJoin = StrokeJoin.bevel;
-    // canvas.drawRect(Rect.fromLTWH(0, 0, width, height), paint2);
-
-    // if(posX>=width-cWidth)
-    //   posX = width-cWidth;
-    if(posY>=height-cHeight)
-      posY = height-cHeight;
+    if(posY>=size.height-cHeight) {
+      posY = size.height-cHeight;
+    }
     var rect = Rect.fromLTWH(posX,posY, cWidth, cHeight);
-    var radis = Math.min(cWidth, cHeight)/2;
+    var radis = cWidth/2;
     canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(radis)), paint);
   }
+  @override
   bool shouldRepaint(SignaturePainter other){
     return true;
   }
+
+
 
 }
