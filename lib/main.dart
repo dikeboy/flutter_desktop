@@ -4,10 +4,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_desktop/moudle/largelist/large_listview.dart';
-import 'package:flutter_desktop/moudle/undotext/uno_textfield.dart';
+import 'package:flutter_desktop/moudle/uno_textfield.dart';
 import 'package:flutter_desktop/utils/WindowSizeService.dart';
 
 import 'base/BasicPage.dart';
+import 'moudle/largetext/large_text.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -85,6 +86,17 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 bindHomeBtn("Large List", () {return LargeListPage();}),
+                bindHomeBtn("UndoTextField", () {return UndoTextField();}),
+              ],
+            )),
+        Container(
+            height: 100,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                bindHomeBtn("Large Text", () {return LargeTextPage();}),
                 bindHomeBtn("UndoTextField", () {return UndoTextField();}),
               ],
             )),
