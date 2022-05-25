@@ -46,7 +46,7 @@ class  LargeListPage extends BasicState {
       itemPositionsListener: itemPositionsListener,
       itemBuilder: (context, index) {
         return  Container(
-            height: 30,
+            height: (index%2+1)*20,
             child:new ListTile(
           title: new Text('${list[index]}'),
         ));
