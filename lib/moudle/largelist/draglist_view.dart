@@ -52,7 +52,7 @@ class DragListScrollView extends StatelessWidget{
                   child: Stack(
                       alignment: AlignmentDirectional.topEnd,
                       children: [
-                        getList(),
+                        getList(context),
                         Container(
                           width: pWidth,
                           child: Stack(
@@ -73,13 +73,15 @@ class DragListScrollView extends StatelessWidget{
 
   }
 
-  Widget getList(){
-    return new ScrollablePositionedList.builder(
+  Widget getList(BuildContext context){
+    return  ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+    child: new ScrollablePositionedList.builder(
       itemCount: itemCount,
       itemScrollController: itemScrollController,
       itemPositionsListener: itemPositionsListener,
       itemBuilder: itemBuilder,
-    );
+    ));
   }
 
 
@@ -157,7 +159,7 @@ class SignaturePainter extends CustomPainter  {
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
-      ..color = Colors.blue
+      ..color = Colors.grey.shade300
       ..isAntiAlias = true
       ..strokeWidth = 2.0
       ..strokeJoin = StrokeJoin.bevel;
